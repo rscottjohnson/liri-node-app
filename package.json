@@ -1,0 +1,19 @@
+{
+  "name": "liri-node-app",
+  "version": "1.0.0",
+  "description": "nodesj-hw",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rscottjohnson/liri-node-app.git"
+  },
+  "author": "scott johnson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rscottjohnson/liri-node-app/issues"
+  },
+  "homepage": "https://github.com/rscottjohnson/liri-node-app#readme"
+}
