@@ -40,7 +40,7 @@ function tweets() {
 function spotThisSong() {
   inquirer.prompt([{
         type: "input",
-        message: "Type the name of the song you'd like to Spotify.",
+        message: "Type the name of the song: ",
         name: "songName"
       },
       {
@@ -81,7 +81,42 @@ function spotThisSong() {
 }
 
 function omdb() {
+  inquirer.prompt([{
+        type: "input",
+        message: "Type the name of the movie: ",
+        name: "movieName"
+      },
+      {
+        type: "confirm",
+        message: "Are you sure:",
+        name: "confirm",
+        default: true
+      }
+    ])
+    .then(function (movieAns) {
+      if (movieAns.confirm) {
 
+        // Request to the OMDB API
+        var queryUrl = "http://www.omdbapi.com/?t=" + movieAns.movieName + "&y=&plot=short&tomatoes=true&apikey=trilogy";
+
+        request(queryUrl, function (error, response, body) {
+
+          // If the request is successful
+          if (!error && response.statusCode === 200) {
+            console.log("\n===============================\n")
+            console.log("Movie information from OMDB:")
+            console.log("\n===============================\n")
+            console.log("RELEASE YEAR: " + JSON.parse(body).Year);
+            console.log("IMDB RATING: " + JSON.parse(body).imdbRating);
+            console.log("ROTTEN TOMATOES RATING: " + JSON.parse(body).Ratings[1].Value);
+            console.log("COUNTRY: " + JSON.parse(body).Country);
+            console.log("LANGUAGE: " + JSON.parse(body).Language);
+            console.log("PLOT: " + JSON.parse(body).Plot);
+            console.log("ACTORS: " + JSON.parse(body).Actors);
+          }
+        });
+      }
+    });
 }
 
 // MAIN PROCESS
@@ -90,7 +125,7 @@ function omdb() {
 inquirer.prompt([{
     type: "checkbox",
     message: "Which action would you like to take?",
-    choices: ["Tweets", "Spotify", "Movies", "Do what it says"],
+    choices: ["Tweets", "Spotify", "Movie", "Do what it says"],
     name: "liriAction"
   }])
   .then(function (user) {
@@ -98,8 +133,8 @@ inquirer.prompt([{
       tweets();
     } else if (user.liriAction == "Spotify") {
       spotThisSong();
-    } else if (user.liriAction == "movie-this") {
-      console.log("movie-this was picked");
+    } else if (user.liriAction == "Movie") {
+      omdb();
     } else if (user.liriAction == "do-what-it-says") {
       console.log("do-what-it-says was picked");
     } else {
