@@ -17,6 +17,9 @@ var fs = require("fs"); // reading / writing files
 
 // Boolean value to initiate or skip inquirer prompts
 var dwis = false;
+var songSearch = "";
+var movieSearch = "";
+var dataArr = [];
 
 // FUNCTIONS
 //====================
@@ -43,6 +46,9 @@ function tweets() {
 }
 
 function spotThisSong() {
+  
+  var spotify = new Spotify(keys.spotify);
+  
   if (dwis === false) {
     inquirer.prompt([{
           type: "input",
@@ -58,27 +64,19 @@ function spotThisSong() {
       ])
       .then(function (songAns) {
         if (songAns.confirm) {
-          var songSearch = "";
 
           if (songAns.songName.length < 1) {
             songSearch = "Ace of Base The Sign";
           } else {
             songSearch = songAns.songName;
           }
-
-          var spotify = new Spotify(keys.spotify);
-
           spotify.search({
             type: 'track',
             query: songSearch,
-            // query: songAns.songName,
-            // limit: 5
           }, function (err, data) {
             if (err) {
               return console.log('Error occurred: ' + err);
             }
-            // console.log(songSearch);
-            // console.log(JSON.stringify(data, null, 2));
             for (var i = 0; i < data.tracks.items.length; i++) {
               console.log("\n===============================\n")
               console.log("Song information from Spotify:")
@@ -88,37 +86,32 @@ function spotThisSong() {
               console.log("PREVIEW LINK: " + data.tracks.items[i].preview_url);
               console.log("ALBUM NAME: " + data.tracks.items[i].album.name);
             }
+            console.log("\n==========END OF RESULTS=========\n")
           });
         } else {
           console.log("\nThat's okay.  Come again when you are more sure.\n");
         }
       });
-  } else {
-    var spotify = new Spotify(keys.spotify);
-
+  } else {    
+    // Read in the data from random.txt
     fs.readFile("random.txt", "utf8", function (error, data) {
 
       if (error) {
         return console.log(error);
       }
-      // Print the contents of data
-      // console.log(data);
-      // Then split it by commas (to make it more readable)
-      var dataArr = data.split(",");
+      
+      // Split the data by commas
+      dataArr = data.split(",");
 
-      var songSearch = dataArr[1];
+      songSearch = dataArr[1];
 
       spotify.search({
         type: 'track',
         query: songSearch
-        // query: songAns.songName,
-        // limit: 5
       }, function (err, data) {
         if (err) {
           return console.log('Error occurred: ' + err);
         }
-        // console.log(songSearch);
-        // console.log(JSON.stringify(data, null, 2));
         for (var i = 0; i < data.tracks.items.length; i++) {
           console.log("\n===============================\n")
           console.log("Song information from Spotify:")
@@ -128,6 +121,7 @@ function spotThisSong() {
           console.log("PREVIEW LINK: " + data.tracks.items[i].preview_url);
           console.log("ALBUM NAME: " + data.tracks.items[i].album.name);
         }
+        console.log("\n==========END OF RESULTS=========\n")
       });
     });
   }
@@ -150,8 +144,6 @@ function omdb() {
       .then(function (movieAns) {
         if (movieAns.confirm) {
 
-          var movieSearch = "";
-
           if (movieAns.movieName.length < 1) {
             movieSearch = "Mr. Nobody";
           } else {
@@ -161,10 +153,7 @@ function omdb() {
           // Request to the OMDB API
           var queryUrl = "http://www.omdbapi.com/?t=" + movieSearch + "&y=&plot=short&tomatoes=true&apikey=trilogy";
 
-          // Need to add something to default to "Mr. Nobody" if no song name is provided
-
           request(queryUrl, function (error, response, body) {
-
             // If the request is successful
             if (!error && response.statusCode === 200) {
               console.log("\n===============================\n")
@@ -188,17 +177,12 @@ function omdb() {
       if (error) {
         return console.log(error);
       }
-      // Print the contents of data
-      // console.log(data);
-      // Then split it by commas (to make it more readable)
-      var dataArr = data.split(",");
+      dataArr = data.split(",");
 
-      var movieSearch = dataArr[1];
+      movieSearch = dataArr[1];
 
       // Request to the OMDB API
       var queryUrl = "http://www.omdbapi.com/?t=" + movieSearch + "&y=&plot=short&tomatoes=true&apikey=trilogy";
-
-      // Need to add something to default to "Mr. Nobody" if no song name is provided
 
       request(queryUrl, function (error, response, body) {
 
@@ -228,11 +212,11 @@ function dWIS() {
       return console.log(error);
     }
 
-    // Print the contents of data
+    // Print the contents of random.txt
     console.log(data);
 
     // Then split it by commas (to make it more readable)
-    var dataArr = data.split(",");
+    dataArr = data.split(",");
     if (dataArr[0] == 'my-tweets') {
       tweets();
     } else if (dataArr[0] == 'spotify-this-song') {
@@ -271,38 +255,3 @@ inquirer.prompt([{
       console.log("Ok. Come back when you'd like to pick something awesome.");
     }
   });
-
-// switch (action) {
-//   case "my-tweets":
-//   myTweets();
-//   break;
-
-//   case "spotify-this-song":
-//   spotThisSong();
-//   break;
-
-//   case "movie-this":
-//   movieThis();
-//   break;
-
-//   case "do-what-it-says":
-//   dwiSays();
-//   break;
-// }
-
-// // If the my-tweets action
-// function myTweets() {
-
-// }
-
-// function spotThisSong() {
-
-// }
-
-// function movieThis() {
-
-// }
-
-// function dwiSays() {
-
-// }
