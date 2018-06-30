@@ -20,6 +20,8 @@ var dwis = false;
 var songSearch = "";
 var movieSearch = "";
 var dataArr = [];
+var textFile = "log.txt";
+var divider = "\n\n============================================================\n\n";
 
 // FUNCTIONS
 //====================
@@ -46,9 +48,9 @@ function tweets() {
 }
 
 function spotThisSong() {
-  
+
   var spotify = new Spotify(keys.spotify);
-  
+
   if (dwis === false) {
     inquirer.prompt([{
           type: "input",
@@ -92,14 +94,14 @@ function spotThisSong() {
           console.log("\nThat's okay.  Come again when you are more sure.\n");
         }
       });
-  } else {    
+  } else {
     // Read in the data from random.txt
     fs.readFile("random.txt", "utf8", function (error, data) {
 
       if (error) {
         return console.log(error);
       }
-      
+
       // Split the data by commas
       dataArr = data.split(",");
 
@@ -127,7 +129,9 @@ function spotThisSong() {
   }
 }
 
+// Movie search
 function omdb() {
+  // If the user didn't choose 'do what it says' prompt for info
   if (dwis === false) {
     inquirer.prompt([{
           type: "input",
@@ -142,8 +146,10 @@ function omdb() {
         }
       ])
       .then(function (movieAns) {
+        // If the user confirmed 'yes'
         if (movieAns.confirm) {
 
+          // If the user didn't enter a movie
           if (movieAns.movieName.length < 1) {
             movieSearch = "Mr. Nobody";
           } else {
@@ -156,21 +162,33 @@ function omdb() {
           request(queryUrl, function (error, response, body) {
             // If the request is successful
             if (!error && response.statusCode === 200) {
-              console.log("\n===============================\n")
-              console.log("Movie information from OMDB:")
-              console.log("\n===============================\n")
-              console.log("MOVIE TITLE: " + movieSearch);
-              console.log("RELEASE YEAR: " + JSON.parse(body).Year);
-              console.log("IMDB RATING: " + JSON.parse(body).imdbRating);
-              console.log("ROTTEN TOMATOES RATING: " + JSON.parse(body).Ratings[1].Value);
-              console.log("COUNTRY: " + JSON.parse(body).Country);
-              console.log("LANGUAGE: " + JSON.parse(body).Language);
-              console.log("PLOT: " + JSON.parse(body).Plot);
-              console.log("ACTORS: " + JSON.parse(body).Actors);
+              
+              var movieData = [
+                "MOVIE TITLE: " + movieSearch,
+                "RELEASE YEAR: " + JSON.parse(body).Year,
+                "IMDB RATING: " + JSON.parse(body).imdbRating,
+                "ROTTEN TOMATOES RATING: " + JSON.parse(body).Ratings[1].Value,
+                "COUNTRY: " + JSON.parse(body).Country,
+                "LANGUAGE: " + JSON.parse(body).Language,
+                "PLOT: " + JSON.parse(body).Plot,
+                "ACTORS: " + JSON.parse(body).Actors,
+              ].join("\n\n");
+    
+              // Log the data to the textFile
+              fs.appendFile(textFile, movieData + divider, function(err) {
+                if (err) throw err;
+                console.log(movieData);
+              });
             }
           });
+
+        // If the user confirmed 'no'
+        } else {
+          console.log("\nThat's okay.  Come again when you are more sure.\n");
         }
       });
+  
+  // If the user chose 'do what it says', read random.txt
   } else {
     fs.readFile("random.txt", "utf8", function (error, data) {
 
@@ -188,17 +206,23 @@ function omdb() {
 
         // If the request is successful
         if (!error && response.statusCode === 200) {
-          console.log("\n===============================\n")
-          console.log("Movie information from OMDB:")
-          console.log("\n===============================\n")
-          console.log("MOVIE TITLE: " + movieSearch);
-          console.log("RELEASE YEAR: " + JSON.parse(body).Year);
-          console.log("IMDB RATING: " + JSON.parse(body).imdbRating);
-          console.log("ROTTEN TOMATOES RATING: " + JSON.parse(body).Ratings[1].Value);
-          console.log("COUNTRY: " + JSON.parse(body).Country);
-          console.log("LANGUAGE: " + JSON.parse(body).Language);
-          console.log("PLOT: " + JSON.parse(body).Plot);
-          console.log("ACTORS: " + JSON.parse(body).Actors);
+
+          var movieData = [
+            "MOVIE TITLE: " + movieSearch,
+            "RELEASE YEAR: " + JSON.parse(body).Year,
+            "IMDB RATING: " + JSON.parse(body).imdbRating,
+            "ROTTEN TOMATOES RATING: " + JSON.parse(body).Ratings[1].Value,
+            "COUNTRY: " + JSON.parse(body).Country,
+            "LANGUAGE: " + JSON.parse(body).Language,
+            "PLOT: " + JSON.parse(body).Plot,
+            "ACTORS: " + JSON.parse(body).Actors,
+          ].join("\n\n");
+
+          // Log the data to the textFile
+          fs.appendFile(textFile, movieData + divider, function(err) {
+            if (err) throw err;
+            console.log(movieData);
+          });
         }
       });
     });
@@ -211,9 +235,6 @@ function dWIS() {
     if (error) {
       return console.log(error);
     }
-
-    // Print the contents of random.txt
-    console.log(data);
 
     // Then split it by commas (to make it more readable)
     dataArr = data.split(",");
