@@ -23,8 +23,9 @@ This command line app is useful as a tool for quickly searching unique data base
 Upon loading, LIRI presents the user with a checkbox dialogue of available actions to take.
 
 1.  The user selects the action from the listing.
-2.  Once they've chosen their action, they may be asked for a follow up input based on their choice followed by a request to confirm.
+2.  Once they've chosen their action, they may be asked for a follow up input based on their choice, and finally a request to confirm.
 3.  Results are displayed in the command line, and the user can scroll through the results.
+4.  The user can also open the log file, `log.txt`, to view a running log of the results of their choices.
 
 ## APIs / Libraries / Technology used
 In order to provide the user with this information, the following APIs, libraries, and technology are used:
